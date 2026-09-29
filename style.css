@@ -465,3 +465,12 @@ img{display:block;width:100%;height:100%;object-fit:cover}
     left: auto;
   }
 }
+@media (max-width: 800px) {
+  body > a.mobile-cta.btn {
+    position: fixed !important;
+    top: auto !important;
+    right: 16px !important;
+    bottom: 40px !important;
+    left: auto !important;
+  }
+}
