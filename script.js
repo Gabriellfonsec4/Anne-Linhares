@@ -1,27 +1,38 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Menu mobile
 const menu = document.querySelector('.menu');
 const links = document.querySelector('.links');
 
 menu.addEventListener('click', () => {
   const open = links.classList.toggle('open');
+
   menu.setAttribute('aria-expanded', String(open));
   menu.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
   menu.classList.toggle('is-open', open);
+
   menu.querySelector('path').setAttribute(
     'd',
     open ? 'M7 7l18 18M25 7 7 25' : 'M5 10h22M5 16h22M5 22h22'
   );
 });
 
-links.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-  links.classList.remove('open');
-  menu.classList.remove('is-open');
-  menu.querySelector('path').setAttribute('d', 'M5 10h22M5 16h22M5 22h22');
-  menu.setAttribute('aria-expanded', 'false');
-  menu.setAttribute('aria-label', 'Abrir menu');
-}));
+links.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    links.classList.remove('open');
+    menu.classList.remove('is-open');
 
+    menu.querySelector('path').setAttribute(
+      'd',
+      'M5 10h22M5 16h22M5 22h22'
+    );
+
+    menu.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-label', 'Abrir menu');
+  });
+});
+
+// Inspirações interativas
 const looks = [
   {
     image: 'assets/resultado-1.webp',
@@ -51,31 +62,42 @@ const lookTitle = document.getElementById('look-title');
 const lookDescription = document.getElementById('look-description');
 const lookLink = document.getElementById('look-link');
 
-document.querySelectorAll('.look-option').forEach(button => button.addEventListener('click', () => {
-  const look = looks[Number(button.dataset.look)];
+document.querySelectorAll('.look-option').forEach(button => {
+  button.addEventListener('click', () => {
+    const look = looks[Number(button.dataset.look)];
 
-  document.querySelectorAll('.look-option').forEach(option => {
-    const selected = option === button;
-    option.classList.toggle('active', selected);
-    option.setAttribute('aria-pressed', String(selected));
+    document.querySelectorAll('.look-option').forEach(option => {
+      const selected = option === button;
+      option.classList.toggle('active', selected);
+      option.setAttribute('aria-pressed', String(selected));
+    });
+
+    lookImage.src = look.image;
+    lookImage.alt = look.alt;
+    lookTitle.textContent = look.title;
+    lookDescription.textContent = look.description;
+
+    const message =
+      `Olá, Anne! Vi a inspiração de ${look.message} no site e gostaria de conversar.`;
+
+    lookLink.href =
+      `https://wa.me/5521969942633?text=${encodeURIComponent(message)}`;
   });
+});
 
-  lookImage.src = look.image;
-  lookImage.alt = look.alt;
-  lookTitle.textContent = look.title;
-  lookDescription.textContent = look.description;
-  lookLink.href = `https://wa.me/5521969942633?text=${encodeURIComponent(`Olá, Anne! Vi a inspiração de ${look.message} no site e gostaria de conversar.`)}`;
-}));
-
+// Ampliação das fotos
 const lightbox = document.querySelector('.lightbox');
 let lastTrigger;
 
-document.querySelectorAll('button.result[data-image]').forEach(button => button.addEventListener('click', () => {
-  lastTrigger = button;
-  lightbox.querySelector('img').src = button.dataset.image;
-  lightbox.classList.add('open');
-  lightbox.querySelector('button').focus();
-}));
+document.querySelectorAll('button.result[data-image]').forEach(button => {
+  button.addEventListener('click', () => {
+    lastTrigger = button;
+
+    lightbox.querySelector('img').src = button.dataset.image;
+    lightbox.classList.add('open');
+    lightbox.querySelector('button').focus();
+  });
+});
 
 function closeImage() {
   lightbox.classList.remove('open');
@@ -90,8 +112,12 @@ lightbox.addEventListener('click', event => {
 });
 
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && lightbox.classList.contains('open')) closeImage();
+  if (event.key === 'Escape' && lightbox.classList.contains('open')) {
+    closeImage();
+  }
 });
+
+// Navegação da galeria de fotos
 const galleryTrack = document.getElementById('gallery-track');
 const galleryCards = Array.from(galleryTrack.children);
 const galleryPrev = document.querySelector('.gallery-prev');
@@ -108,6 +134,7 @@ function updateGallery() {
 
   galleryCards.forEach((card, index) => {
     const current = Math.abs(card.getBoundingClientRect().left - left);
+
     if (current < distance) {
       distance = current;
       nearest = index;
@@ -115,14 +142,23 @@ function updateGallery() {
   });
 
   galleryIndex = nearest;
-  galleryCount.innerHTML = `${String(nearest + 1).padStart(2, '0')} <small>/ ${String(galleryCards.length).padStart(2, '0')}</small>`;
-  galleryProgress.style.transform = `scaleX(${(nearest + 1) / galleryCards.length})`;
+
+  galleryCount.innerHTML =
+    `${String(nearest + 1).padStart(2, '0')} ` +
+    `<small>/ ${String(galleryCards.length).padStart(2, '0')}</small>`;
+
+  galleryProgress.style.transform =
+    `scaleX(${(nearest + 1) / galleryCards.length})`;
+
   galleryPrev.disabled = nearest === 0;
   galleryNext.disabled = nearest === galleryCards.length - 1;
 }
 
 function moveGallery(index) {
-  const next = galleryCards[Math.max(0, Math.min(index, galleryCards.length - 1))];
+  const next = galleryCards[
+    Math.max(0, Math.min(index, galleryCards.length - 1))
+  ];
+
   const target =
     galleryTrack.scrollLeft +
     next.getBoundingClientRect().left -
@@ -130,14 +166,22 @@ function moveGallery(index) {
 
   galleryTrack.scrollTo({
     left: target,
-    behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    behavior: matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth'
   });
 }
 
-galleryPrev.addEventListener('click', () => moveGallery(galleryIndex - 1));
-galleryNext.addEventListener('click', () => moveGallery(galleryIndex + 1));
+galleryPrev.addEventListener('click', () => {
+  moveGallery(galleryIndex - 1);
+});
+
+galleryNext.addEventListener('click', () => {
+  moveGallery(galleryIndex + 1);
+});
 
 let galleryFrame;
+
 galleryTrack.addEventListener('scroll', () => {
   cancelAnimationFrame(galleryFrame);
   galleryFrame = requestAnimationFrame(updateGallery);
@@ -145,3 +189,69 @@ galleryTrack.addEventListener('scroll', () => {
 
 window.addEventListener('resize', updateGallery);
 updateGallery();
+
+// Vídeos: a URL só é adicionada quando a pessoa toca no card.
+const filmDialog = document.querySelector('.film-dialog');
+const filmPlayer = document.getElementById('film-player');
+
+let filmTrigger;
+
+function closeFilm() {
+  filmPlayer.pause();
+
+  if (filmDialog.open) {
+    filmDialog.close();
+  }
+}
+
+filmDialog.addEventListener('close', () => {
+  filmPlayer.pause();
+  filmPlayer.removeAttribute('src');
+  filmPlayer.removeAttribute('poster');
+  filmPlayer.load();
+
+  document.body.classList.remove('film-locked');
+  filmTrigger?.focus();
+});
+
+document.querySelectorAll('.film-open').forEach(button => {
+  button.addEventListener('click', () => {
+    filmTrigger = button;
+
+    document.getElementById('film-title').textContent =
+      button.dataset.title;
+
+    document.getElementById('film-error').hidden = true;
+
+    document.getElementById('film-download').href =
+      button.dataset.video;
+
+    filmPlayer.poster = button.dataset.poster;
+    filmPlayer.src = button.dataset.video;
+
+    filmDialog.showModal();
+    document.body.classList.add('film-locked');
+
+    filmPlayer.play().catch(() => {
+      // Se o navegador bloquear a reprodução, os controles continuam disponíveis.
+    });
+  });
+});
+
+document.querySelector('.film-close').addEventListener('click', closeFilm);
+
+filmPlayer.addEventListener('error', () => {
+  document.getElementById('film-error').hidden = false;
+});
+
+document.querySelector('.film-fullscreen').addEventListener('click', async () => {
+  try {
+    if (filmPlayer.webkitEnterFullscreen) {
+      filmPlayer.webkitEnterFullscreen();
+    } else if (filmPlayer.requestFullscreen) {
+      await filmPlayer.requestFullscreen();
+    }
+  } catch {
+    // O player continua ocupando a tela mesmo sem o modo nativo.
+  }
+});
